@@ -54,7 +54,8 @@ public final class TokenUtils {
 
     private static String decode(AbstractBuild<?, ?> build, String template)
             throws MacroEvaluationException, IOException, InterruptedException {
-        if (build == null) {
+        // only try and resolve tokens if there actually are tokens
+        if (build == null && template != null && template.contains("$")) {
             return hideVariable(template);
         } else {
             return TokenMacro.expandAll(build, TaskListener.NULL, template);
