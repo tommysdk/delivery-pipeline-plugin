@@ -24,7 +24,7 @@ cache:
   directories:
   - $HOME/.m2
 after_success:
-  - mvn jacoco:report coveralls:report
+  - mvn cobertura:cobertura coveralls:report
   - bash <(curl -s https://codecov.io/bash)
 addons:
   chrome: stable
