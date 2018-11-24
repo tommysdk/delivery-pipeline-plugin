@@ -23,7 +23,7 @@ import com.google.common.collect.ImmutableList;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
-import se.diabol.jenkins.core.AbstractItem;
+import se.diabol.dpp.core.AbstractItem;
 import se.diabol.jenkins.core.GenericComponent;
 
 import java.util.Collections;

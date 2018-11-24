@@ -26,7 +26,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
 
 import org.kohsuke.stapler.export.ExportedBean;
-import se.diabol.jenkins.core.AbstractItem;
+import se.diabol.dpp.core.AbstractItem;
 import se.diabol.jenkins.core.GenericComponent;
 import se.diabol.jenkins.pipeline.PipelinePagination;
 import se.diabol.jenkins.pipeline.util.FullScreen;

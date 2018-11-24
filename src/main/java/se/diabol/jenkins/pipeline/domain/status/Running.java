@@ -19,7 +19,7 @@ package se.diabol.jenkins.pipeline.domain.status;
 
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
-import se.diabol.jenkins.core.AbstractItem;
+import se.diabol.dpp.core.AbstractItem;
 
 @ExportedBean(defaultVisibility = AbstractItem.VISIBILITY)
 public class Running extends SimpleStatus {

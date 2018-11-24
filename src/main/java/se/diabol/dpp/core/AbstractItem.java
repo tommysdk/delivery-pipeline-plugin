@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with Delivery Pipeline Plugin.
 If not, see <http://www.gnu.org/licenses/>.
 */
-package se.diabol.jenkins.core;
+package se.diabol.dpp.core;
 
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
@@ -25,6 +25,7 @@ import org.kohsuke.stapler.export.ExportedBean;
  */
 @ExportedBean(defaultVisibility = AbstractItem.VISIBILITY)
 public abstract class AbstractItem {
+
     private final String name;
 
     public static final int VISIBILITY = 100;

@@ -54,9 +54,17 @@ public final class ProjectUtil {
     }
 
     public static ListBoxModel fillAllProjects(ItemGroup<?> context, Class<? extends Job> type) {
+        return fillAllProjects(context, Collections.singletonList(type));
+    }
+
+    public static ListBoxModel fillAllProjects(ItemGroup<?> context, List<Class<? extends Job>> types) {
         ListBoxModel options = new ListBoxModel();
-        for (Job p : JenkinsUtil.getInstance().getAllItems(type)) {
-            options.add(p.getFullDisplayName(), p.getRelativeNameFrom(context));
+        if (types != null && !types.isEmpty()) {
+            types.parallelStream().forEach(type -> {
+                for (Job p : JenkinsUtil.getInstance().getAllItems(type)) {
+                    options.add(p.getFullDisplayName(), p.getRelativeNameFrom(context));
+                }
+            });
         }
         return options;
     }
@@ -68,15 +76,15 @@ public final class ProjectUtil {
      * and will NOT add. Adding a project that already exists will produce a stack overflow.
      *
      * @param first The first project
-     * @param last The last project to visualize
+     * @param last  The last project to visualize
      * @return A map of all downstream projects.
      * @see ProjectUtil#getAllDownstreamProjects(
-     * hudson.model.AbstractProject, hudson.model.AbstractProject, java.util.Map)
+     *hudson.model.AbstractProject, hudson.model.AbstractProject, java.util.Map)
      */
     public static Map<String, AbstractProject<?, ?>> getAllDownstreamProjects(AbstractProject first,
                                                                               AbstractProject last) {
         Map<String, AbstractProject<?, ?>> projects = newLinkedHashMap();
-        return  getAllDownstreamProjects(first, last, projects);
+        return getAllDownstreamProjects(first, last, projects);
     }
 
     /**
@@ -85,8 +93,8 @@ public final class ProjectUtil {
      * A project that has a downstream project and will eventually loop back to itself will log a warning,
      * and will NOT add. Adding a project that already exists will produce a stack overflow.
      *
-     * @param first The first project
-     * @param last The last project to visualize
+     * @param first    The first project
+     * @param last     The last project to visualize
      * @param projects Current map of all sub projects.
      * @return A map of all downstream projects.
      */
@@ -172,7 +180,7 @@ public final class ProjectUtil {
         List<Cause.UpstreamCause> causes = Util.filter(project.getQueueItem().getCauses(),
                 Cause.UpstreamCause.class);
         @SuppressWarnings("unchecked")
-        List<AbstractProject<?,?>> upstreamProjects = project.getUpstreamProjects();
+        List<AbstractProject<?, ?>> upstreamProjects = project.getUpstreamProjects();
         for (AbstractProject<?, ?> upstreamProject : upstreamProjects) {
             AbstractBuild upstreamBuild = BuildUtil.match(upstreamProject.getBuilds(), firstBuild);
             if (upstreamBuild != null) {

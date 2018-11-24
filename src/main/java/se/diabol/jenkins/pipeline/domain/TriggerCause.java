@@ -22,7 +22,7 @@ import hudson.model.Job;
 import hudson.model.Run;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
-import se.diabol.jenkins.core.AbstractItem;
+import se.diabol.dpp.core.AbstractItem;
 import se.diabol.jenkins.pipeline.CauseResolver;
 
 import java.util.ArrayList;

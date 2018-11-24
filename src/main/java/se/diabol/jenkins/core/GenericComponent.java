@@ -19,6 +19,7 @@ package se.diabol.jenkins.core;
 
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
+import se.diabol.dpp.core.AbstractItem;
 
 import java.util.List;
 

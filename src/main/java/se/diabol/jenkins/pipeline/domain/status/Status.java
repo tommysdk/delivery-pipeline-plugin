@@ -45,6 +45,8 @@ public interface Status {
 
     boolean isNotBuilt();
 
+    boolean isWaitingForInput();
+
     long getLastActivity();
 
     String getTimestamp();

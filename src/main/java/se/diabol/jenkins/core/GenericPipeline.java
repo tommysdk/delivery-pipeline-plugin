@@ -18,6 +18,7 @@ If not, see <http://www.gnu.org/licenses/>.
 package se.diabol.jenkins.core;
 
 import org.kohsuke.stapler.export.ExportedBean;
+import se.diabol.dpp.core.AbstractItem;
 
 @ExportedBean(defaultVisibility = AbstractItem.VISIBILITY)
 public abstract class GenericPipeline extends AbstractItem {

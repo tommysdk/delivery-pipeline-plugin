@@ -22,7 +22,7 @@ import hudson.scm.ChangeLogSet;
 import hudson.scm.RepositoryBrowser;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
-import se.diabol.jenkins.core.AbstractItem;
+import se.diabol.dpp.core.AbstractItem;
 
 import java.io.IOException;
 import java.net.URL;

@@ -29,7 +29,7 @@ import hudson.model.ItemGroup;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
-import se.diabol.jenkins.core.AbstractItem;
+import se.diabol.dpp.core.AbstractItem;
 import se.diabol.jenkins.pipeline.PipelineProperty;
 import se.diabol.jenkins.pipeline.domain.results.StaticAnalysisResult;
 import se.diabol.jenkins.pipeline.domain.results.TestResult;
