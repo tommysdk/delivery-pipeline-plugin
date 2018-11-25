@@ -1,6 +1,7 @@
 package se.diabol.dpp.view;
 
 import hudson.Extension;
+import hudson.model.AbstractDescribableImpl;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.ItemGroup;
@@ -10,7 +11,6 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
-import se.diabol.jenkins.pipeline.DeliveryPipelineView;
 import se.diabol.jenkins.pipeline.util.ProjectUtil;
 
 import javax.annotation.Nonnull;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ComponentSpec {
+public class ComponentSpec extends AbstractDescribableImpl<ComponentSpec> {
 
     private String name;
     private String initialJob;
@@ -70,7 +70,7 @@ public class ComponentSpec {
 
     @Extension
     @SuppressWarnings("unused")
-    public static class DescriptorImpl extends Descriptor<DeliveryPipelineView.ComponentSpec> {
+    public static class DescriptorImpl extends Descriptor<ComponentSpec> {
 
         @Nonnull
         @Override

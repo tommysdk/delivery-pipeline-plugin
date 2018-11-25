@@ -24,6 +24,7 @@ import static se.diabol.jenkins.pipeline.domain.status.StatusType.DISABLED;
 import static se.diabol.jenkins.pipeline.domain.status.StatusType.FAILED;
 import static se.diabol.jenkins.pipeline.domain.status.StatusType.IDLE;
 import static se.diabol.jenkins.pipeline.domain.status.StatusType.NOT_BUILT;
+import static se.diabol.jenkins.pipeline.domain.status.StatusType.PAUSED_PENDING_INPUT;
 import static se.diabol.jenkins.pipeline.domain.status.StatusType.QUEUED;
 import static se.diabol.jenkins.pipeline.domain.status.StatusType.RUNNING;
 import static se.diabol.jenkins.pipeline.domain.status.StatusType.SUCCESS;
@@ -47,6 +48,7 @@ import java.util.List;
 
 @ExportedBean(defaultVisibility = AbstractItem.VISIBILITY)
 public class SimpleStatus implements Status {
+
     private final StatusType type;
     private final long lastActivity;
     private final long duration;
@@ -145,6 +147,11 @@ public class SimpleStatus implements Status {
     @Override
     public boolean isNotBuilt() {
         return NOT_BUILT.equals(type);
+    }
+
+    @Override
+    public boolean isWaitingForInput() {
+        return PAUSED_PENDING_INPUT.equals(type);
     }
 
     @Override
