@@ -17,13 +17,20 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 package se.diabol.dpp.model;
 
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.ItemGroup;
+import hudson.model.Result;
+import org.kohsuke.stapler.export.Exported;
 import se.diabol.dpp.core.AbstractItem;
 import se.diabol.jenkins.pipeline.domain.Change;
-import se.diabol.jenkins.workflow.model.Task;
 
+import javax.annotation.CheckForNull;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class Stage extends AbstractItem {
@@ -43,9 +50,164 @@ public class Stage extends AbstractItem {
         super(name);
     }
 
+    public static Stage getPrototypeStage(String name, List<Task> tasks) {
+        Stage stage = new Stage(name);
+        stage.setTasks(tasks);
+        return stage;
+    }
 
-    // TODO: Implement class
-    
+    public static List<Stage> extractStages(AbstractProject firstProject, AbstractProject lastProject) {
+        // TODO: Adapt method signature and implement
+        return null;
+    }
+
+    public Stage createAggregatedStage(ItemGroup context, AbstractProject firstProject) {
+        // TODO: Adapt method signature and implement
+        return null;
+    }
+
+    public Stage createLatestStage(ItemGroup context, AbstractBuild firstBuild) {
+        // TODO: Adapt method signature and implement
+        return null;
+    }
+
+    public static List<Stage> placeStages(AbstractProject firstProject, Collection<Stage> stages) {
+        // TODO: Adapt method signature and implement
+        return null;
+    }
+
+    protected static void sortByRowsCols(List<Stage> stages) {
+        // TODO: Implement
+        return;
+    }
+
+    @CheckForNull
+    protected static Stage findStageForJob(String name, Collection<Stage> stages) {
+        // TODO: Implement class
+        return null;
+    }
+
+    @CheckForNull
+    public AbstractBuild getHighestBuild(AbstractProject firstProject, ItemGroup context) {
+        return getHighestBuild(firstProject, context, null);
+    }
+
+    @CheckForNull
+    public AbstractBuild getHighestBuild(AbstractProject firstProject, ItemGroup context, Result minResult) {
+    }
+
+    @Exported
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    @Exported
+    public int getRow() {
+        return row;
+    }
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    @Exported
+    public int getColumn() {
+        return column;
+    }
+
+    public void setColumn(int column) {
+        this.column = column;
+    }
+
+    @Exported
+    public List<Stage> getDownstreamStages() {
+        return downstreamStages;
+    }
+
+    public void setDownstreamStages(List<Stage> downstreamStages) {
+        this.downstreamStages = downstreamStages;
+    }
+
+    @Exported
+    public List<Long> getDownstreamStageIds() {
+        return downstreamStageIds;
+    }
+
+    public void setDownstreamStageIds(List<Long> downstreamStageIds) {
+        this.downstreamStageIds = downstreamStageIds;
+    }
+
+    @Exported
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
+
+    @Exported
+    public Map<String, List<String>> getTaskConnections() {
+        return taskConnections;
+    }
+
+    public void setTaskConnections(Map<String, List<String>> taskConnections) {
+        this.taskConnections = taskConnections;
+    }
+
+    @Exported
+    public Set<Change> getChanges() {
+        return changes;
+    }
+
+    public void setChanges(Set<Change> changes) {
+        this.changes = changes;
+    }
+
+    @Exported
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Stage stage = (Stage) o;
+        return id == stage.id &&
+                row == stage.row &&
+                column == stage.column &&
+                Objects.equals(downstreamStages, stage.downstreamStages) &&
+                Objects.equals(downstreamStageIds, stage.downstreamStageIds) &&
+                Objects.equals(tasks, stage.tasks) &&
+                Objects.equals(taskConnections, stage.taskConnections) &&
+                Objects.equals(changes, stage.changes) &&
+                Objects.equals(version, stage.version);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, row, column, downstreamStages, downstreamStageIds, tasks, taskConnections, changes, version);
+    }
+
+    @Override
+    public String toString() {
+        return "Stage{" +
+                "id=" + id +
+                ", name='" + super.getName() + '\'' +
+                ", version='" + version + '\'' +
+                ", tasks=" + tasks +
+                '}';
+    }
+
     public static class Builder {
 
         private long id;
@@ -56,6 +218,7 @@ public class Stage extends AbstractItem {
         private List<Task> tasks;
         private Map<String, List<String>> taskConnections;
         private Set<Change> changes = new HashSet<>();
+        private String name;
         private String version;
         
         public Builder() {
@@ -101,9 +264,28 @@ public class Stage extends AbstractItem {
             return this;
         }
 
+        public Builder withName(String name) {
+            this.name = name;
+            return this;
+        }
+
         public Builder withVersion(String version) {
             this.version = version;
             return this;
+        }
+
+        public Stage build() {
+            Stage stage = new Stage(name);
+            stage.setId(id);
+            stage.setRow(row);
+            stage.setColumn(column);
+            stage.setDownstreamStages(downstreamStages);
+            stage.setDownstreamStageIds(downstreamStageIds);
+            stage.setTasks(tasks);
+            stage.setTaskConnections(taskConnections);
+            stage.setChanges(changes);
+            stage.setVersion(version);
+            return stage;
         }
     }
 }
