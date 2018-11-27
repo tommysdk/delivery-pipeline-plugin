@@ -24,14 +24,11 @@ import hudson.model.Job;
 import hudson.model.JobProperty;
 import hudson.model.JobPropertyDescriptor;
 import hudson.util.FormValidation;
-
 import net.sf.json.JSONObject;
-
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.export.Exported;
-
 import se.diabol.jenkins.pipeline.util.JenkinsUtil;
 
 import java.util.HashSet;
@@ -52,6 +49,11 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
         setStageName(stageName);
         setTaskName(taskName);
         setDescriptionTemplate(descriptionTemplate);
+    }
+
+    public boolean isStageNameNotEmpty() {
+        String stageName = getStageName();
+        return stageName != null && stageName.length() > 0;
     }
 
     @Exported
@@ -142,7 +144,7 @@ public class PipelineProperty extends JobProperty<AbstractProject<?, ?>> {
         }
 
         @Override
-        public PipelineProperty newInstance(StaplerRequest sr, JSONObject formData) throws FormException {
+        public PipelineProperty newInstance(StaplerRequest sr, JSONObject formData) {
             boolean configEnabled = sr.getParameter("enabled") != null;
             if (!configEnabled) {
                 return null;

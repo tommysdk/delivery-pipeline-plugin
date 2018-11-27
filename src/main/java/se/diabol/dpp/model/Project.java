@@ -54,7 +54,7 @@ public final class Project {
 
     public void abortBuild(int buildNumber) throws TriggerException {
         if (getDelegate() != null) {
-            if (AbstractProject.class.equals(implementation)) {
+            if (AbstractProject.class.equals(getImplementation())) {
                 AbstractBuild build = ((AbstractProject) getDelegate()).getBuildByNumber(buildNumber);
                 throwTriggerExceptionIfNull(build, buildNumber);
                 try {
@@ -63,7 +63,7 @@ public final class Project {
                     throw new TriggerException("Failed to abort build on project: " + getName()
                             + ", with build number: " + buildNumber);
                 }
-            } else if (WorkflowJob.class.equals(implementation)) {
+            } else if (WorkflowJob.class.equals(getImplementation())) {
                 WorkflowRun build = ((WorkflowJob) getDelegate()).getBuildByNumber(buildNumber);
                 throwTriggerExceptionIfNull(build, buildNumber);
                 build.doStop();

@@ -18,6 +18,7 @@ If not, see <http://www.gnu.org/licenses/>.
 package se.diabol.jenkins.pipeline;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -169,5 +170,31 @@ public class PipelinePropertyTest {
         assertTrue(stageNames.contains("QA"));
     }
 
+    @Test
+    @WithoutJenkins
+    public void isStageNameNotEmptyShouldRecognizeNullStageName() {
+        PipelineProperty property = new PipelineProperty();
+        property.setStageName(null);
+        assertFalse(property.isStageNameNotEmpty());
+    }
+
+    @Test
+    @WithoutJenkins
+    public void isStageNameNotEmptyShouldRecognizeEmptyStageName() {
+        PipelineProperty property = new PipelineProperty();
+        property.setStageName("");
+        assertFalse(property.isStageNameNotEmpty());
+    }
+
+    @Test
+    @WithoutJenkins
+    public void isStageNameNotEmptyShouldRecognizeNonNullStageName() {
+        PipelineProperty property = new PipelineProperty();
+        property.setStageName(" ");
+        assertTrue(property.isStageNameNotEmpty());
+
+        property.setStageName("stage name");
+        assertTrue(property.isStageNameNotEmpty());
+    }
 
 }

@@ -219,7 +219,6 @@ public class Stage extends AbstractItem {
             stageTasks.add(task.getLatestTask(context, firstBuild));
         }
         return new Stage(this, stageTasks, null, id);
-
     }
 
 
@@ -367,7 +366,6 @@ public class Stage extends AbstractItem {
             }
         }
         return null;
-
     }
 
     @CheckForNull

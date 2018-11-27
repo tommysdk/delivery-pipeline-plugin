@@ -17,34 +17,43 @@ If not, see <http://www.gnu.org/licenses/>.
 */
 package se.diabol.dpp.model;
 
-import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.ItemGroup;
 import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TopLevelItem;
 import org.kohsuke.stapler.export.Exported;
 import se.diabol.dpp.core.AbstractItem;
+import se.diabol.dpp.util.Projects;
+import se.diabol.dpp.util.Upstreams;
+import se.diabol.jenkins.pipeline.PipelineProperty;
 import se.diabol.jenkins.pipeline.domain.Change;
+import se.diabol.jenkins.pipeline.domain.PipelineException;
 
 import javax.annotation.CheckForNull;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class Stage extends AbstractItem {
 
     private long id;
     private int row;
     private int column;
-    private List<Stage> downstreamStages;
+    private List<String> downstreamStages;
     private List<Long> downstreamStageIds;
     private List<Task> tasks;
     private Map<String, List<String>> taskConnections;
     private Set<Change> changes = new HashSet<>();
     private String version;
-    // TODO: List<Task> for tasks or taskConnections map?
 
     Stage(String name) {
         super(name);
@@ -56,9 +65,37 @@ public class Stage extends AbstractItem {
         return stage;
     }
 
-    public static List<Stage> extractStages(AbstractProject firstProject, AbstractProject lastProject) {
-        // TODO: Adapt method signature and implement
-        return null;
+    public static List<Stage> extractStages(Project firstProject, Set<Project> lastProjects) throws PipelineException {
+        Map<String, Stage> stages = new LinkedHashMap<>();
+        Map<String, Project> downstreamProjects = Projects.getAllDownstreamProjects(firstProject, lastProjects);
+        for (Project project : downstreamProjects.values()) {
+            String stageName = project.getDelegate().getDisplayName();
+
+            Task task = null; // TODO Impl: Task.getPrototypeTask(project, project.getName().equals(firstProject.getName()));
+            Predicate<Project> isLastProject = p -> p.getName().equals(project.getName());
+            if (lastProjects.stream().anyMatch(isLastProject)) {
+                task.getDownstreamTasks().clear();
+            }
+
+            PipelineProperty property = (PipelineProperty) project.getDelegate().getProperty(PipelineProperty.class);
+            if (property == null && project.getDelegate().getParent() instanceof AbstractProject) {
+                property = (PipelineProperty) ((AbstractProject)
+                        project.getDelegate().getParent()).getProperty(PipelineProperty.class);
+            }
+            if (property != null && property.isStageNameNotEmpty()) {
+                stageName = property.getStageName();
+            }
+
+            Stage stage = stages.get(stageName);
+            if (stage == null) {
+                stage = Stage.getPrototypeStage(stageName, Collections.emptyList());
+            }
+
+            LinkedList<Task> tasks = new LinkedList<>(stage.getTasks());
+            tasks.addLast(task);
+            stages.put(stageName, Stage.getPrototypeStage(stageName, tasks));
+        }
+        return StageGraph.placeStages(firstProject, stages.values());
     }
 
     public Stage createAggregatedStage(ItemGroup context, AbstractProject firstProject) {
@@ -66,34 +103,74 @@ public class Stage extends AbstractItem {
         return null;
     }
 
-    public Stage createLatestStage(ItemGroup context, AbstractBuild firstBuild) {
-        // TODO: Adapt method signature and implement
-        return null;
+    public Stage createLatestStage(ItemGroup context, Run firstBuild) {
+        List<Task> stageTasks = new ArrayList<>();
+        for (Task task : getTasks()) {
+            stageTasks.add(task);//TODO task.getLatestTask(context, firstBuild));
+        }
+
+        return new Stage.Builder()
+                .withId(getId())
+                .withName(getName())
+                .withColumn(getColumn())
+                .withRow(getRow())
+                .withDownstreamStages(getDownstreamStages())
+                .withDownstreamStageIds(getDownstreamStageIds())
+                .withTasks(stageTasks)
+                .withTaskConnections(getTaskConnections())
+                .withVersion(getVersion())
+                .build();
     }
 
-    public static List<Stage> placeStages(AbstractProject firstProject, Collection<Stage> stages) {
-        // TODO: Adapt method signature and implement
-        return null;
-    }
-
-    protected static void sortByRowsCols(List<Stage> stages) {
-        // TODO: Implement
-        return;
+    /**
+     * Sorts the specified list of stages, first by rows, then by columns.
+     *
+     * @param stages the list of stages to sort based on their rows and column properties.
+     */
+    protected static void sortByRowsAndColumns(List<Stage> stages) {
+        stages.sort((stage1, stage2) -> {
+            int result = Integer.compare(stage1.getRow(), stage2.getRow());
+            if (result == 0) {
+                return Integer.compare(stage1.getColumn(), stage2.getColumn());
+            } else {
+                return result;
+            }
+        });
     }
 
     @CheckForNull
     protected static Stage findStageForJob(String name, Collection<Stage> stages) {
-        // TODO: Implement class
+        for (Stage stage : stages) {
+            if (stage.getTasks().stream().anyMatch(task -> task.getId().equals(name))) {
+                return stage;
+            }
+        }
         return null;
     }
 
     @CheckForNull
-    public AbstractBuild getHighestBuild(AbstractProject firstProject, ItemGroup context) {
+    public Run getHighestBuild(Project firstProject, ItemGroup context) {
         return getHighestBuild(firstProject, context, null);
     }
 
     @CheckForNull
-    public AbstractBuild getHighestBuild(AbstractProject firstProject, ItemGroup context, Result minResult) {
+    public Run getHighestBuild(Project firstProject,
+                               ItemGroup<? extends TopLevelItem> context,
+                               Result minResult) {
+        int highest = -1;
+        for (Task task : getTasks()) {
+            Project project = Projects.resolve(task.getId(), context);
+
+            Run firstBuild = Upstreams.getFirstUpstreamBuild(project, firstProject, minResult);
+            if (firstBuild != null && firstBuild.getNumber() > highest) {
+                highest = firstBuild.getNumber();
+            }
+        }
+
+        if (highest <= 0) {
+            return null;
+        }
+        return firstProject.getDelegate().getBuildByNumber(highest);
     }
 
     @Exported
@@ -124,11 +201,11 @@ public class Stage extends AbstractItem {
     }
 
     @Exported
-    public List<Stage> getDownstreamStages() {
+    public List<String> getDownstreamStages() {
         return downstreamStages;
     }
 
-    public void setDownstreamStages(List<Stage> downstreamStages) {
+    public void setDownstreamStages(List<String> downstreamStages) {
         this.downstreamStages = downstreamStages;
     }
 
@@ -213,14 +290,14 @@ public class Stage extends AbstractItem {
         private long id;
         private int row;
         private int column;
-        private List<Stage> downstreamStages;
+        private List<String> downstreamStages;
         private List<Long> downstreamStageIds;
         private List<Task> tasks;
         private Map<String, List<String>> taskConnections;
         private Set<Change> changes = new HashSet<>();
         private String name;
         private String version;
-        
+
         public Builder() {
         }
 
@@ -239,7 +316,7 @@ public class Stage extends AbstractItem {
             return this;
         }
 
-        public Builder withDownstreamStages(List<Stage> downstreamStages) {
+        public Builder withDownstreamStages(List<String> downstreamStages) {
             this.downstreamStages = downstreamStages;
             return this;
         }

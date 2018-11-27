@@ -15,7 +15,16 @@ You should have received a copy of the GNU General Public License
 along with Delivery Pipeline Plugin.
 If not, see <http://www.gnu.org/licenses/>.
 */
-package se.diabol.dpp;
+package se.diabol.dpp.util;
 
-public class StageGraph {
+import org.jgrapht.EdgeFactory;
+import se.diabol.dpp.model.Edge;
+import se.diabol.dpp.model.Stage;
+
+public final class StageEdgeFactory implements EdgeFactory<Stage, Edge> {
+
+    @Override
+    public Edge createEdge(Stage sourceVertex, Stage targetVertex) {
+        return new Edge(sourceVertex, targetVertex);
+    }
 }

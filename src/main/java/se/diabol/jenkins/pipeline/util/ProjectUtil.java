@@ -60,7 +60,7 @@ public final class ProjectUtil {
     public static ListBoxModel fillAllProjects(ItemGroup<?> context, List<Class<? extends Job>> types) {
         ListBoxModel options = new ListBoxModel();
         if (types != null && !types.isEmpty()) {
-            types.parallelStream().forEach(type -> {
+            types.forEach(type -> {
                 for (Job p : JenkinsUtil.getInstance().getAllItems(type)) {
                     options.add(p.getFullDisplayName(), p.getRelativeNameFrom(context));
                 }
